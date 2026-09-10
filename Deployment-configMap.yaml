@@ -13,11 +13,18 @@ spec:
         app: index-pod
     spec:
       containers:
-        - name: index
-          image: tp-compose11-nginx:latest
-          imagePullPolicy: Never
+        - name: nginx
+          image: nginx:latest
           ports:
             - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+      volumes:
+        - name: html
+          configMap:
+            name: nginx-html
 
 ---
 apiVersion: v1
