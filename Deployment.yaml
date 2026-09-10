@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: index-deployment
+spec:
+  selector:
+    matchLabels:
+      app: index-pod
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: index-pod
+    spec:
+      containers:
+      - name: index
+        image: tp-compose11-nginx:latest
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: index-service
+spec:
+  ports:
+  - port: 8080
+    targetPort: 80
+  selector:
+    app: index-pod

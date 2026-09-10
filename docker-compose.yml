@@ -1,0 +1,10 @@
+name: tp-compose:1.0
+services:
+  nginx:
+    build: .
+    ports:
+      - '8080:80'
+    volumes:
+      - my-vol:/index.html
+volumes:
+  my-vol:
