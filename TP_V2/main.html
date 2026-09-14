@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal</title>
+</head>
+<body>
+    <h1>Hola Mundo</h1>
+
+    <!-- Enlace hacia la página de estadísticas -->
+    <a href="http://localhost:8082">Ver Estadísticas</a>
+
+    <script>
+        // Registra la visita a la página 'main' llamando al contenedor FastAPI
+        const apiUrl = 'http://localhost:8000/visit/main';
+
+        fetch(apiUrl, { method: 'POST' })
+            .then(response => console.log('Visita a main registrada'))
+            .catch(error => console.error('Error al registrar visita:', error));
+    </script>
+</body>
+</html>

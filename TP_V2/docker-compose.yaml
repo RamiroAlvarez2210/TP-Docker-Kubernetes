@@ -1,0 +1,25 @@
+name: tp
+services:
+  fastapi:
+    build: .
+    ports:
+      - '8000:8000'
+    volumes:
+      - my-vol:/data/
+
+  nginx-main:
+    image: nginx:alpine
+    ports:
+      - 8081:80
+    volumes:
+      - ./main.html:/usr/share/nginx/html/index.html:Z
+
+  nginx-estadisticas:
+    image: nginx:alpine
+    ports:
+      - 8082:80
+    volumes:
+      - ./estadisticas.html:/usr/share/nginx/html/index.html:Z
+
+volumes:
+  my-vol:

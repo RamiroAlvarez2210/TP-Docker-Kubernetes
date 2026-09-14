@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas</title>
+</head>
+<body>
+    <h1>Estadísticas de Visitas</h1>
+
+    <ul>
+        <li>Visitas a Main: <strong id="main-count">Cargando...</strong></li>
+        <li>Visitas a Estadísticas: <strong id="stats-count">Cargando...</strong></li>
+        <li><strong>Total de Visitas: <span id="total-count">Cargando...</span></strong></li>
+    </ul>
+
+    <!-- Enlace para volver a la página principal -->
+    <a href="http://localhost:8081">Volver a Main</a>
+
+    <script>
+        const visitUrl = 'http://localhost:8000/visit/estadisticas';
+        const statsUrl = 'http://localhost:8000/stats';
+
+        // 1. Registra la visita a esta página
+        fetch(visitUrl, { method: 'POST' })
+            .then(() => {
+                // 2. Una vez registrada, pide todas las estadísticas al backend
+                return fetch(statsUrl);
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 3. Inyecta los valores devueltos por FastAPI en el HTML
+                document.getElementById('main-count').innerText = data.main;
+                document.getElementById('stats-count').innerText = data.estadisticas;
+                document.getElementById('total-count').innerText = data.total;
+            })
+            .catch(error => console.error('Error obteniendo estadísticas:', error));
+    </script>
+</body>
+</html>

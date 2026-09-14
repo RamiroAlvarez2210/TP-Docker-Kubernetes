@@ -2,18 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Estadísticas</title>
+    <title>Formulario</title>
 </head>
 <body>
-    <h2>Contador de Visitas</h2>
+    <h2>Ingreso de Información</h2>
     
-    <ul>
-        <li>Accesos a Inicio: <strong>0</strong></li>
-        <li>Accesos a Formulario: <strong>0</strong></li>
-        <li>Accesos a Estadísticas: <strong>0</strong></li>
-    </ul>
-    
-    <h3>Total acumulado: 0</h3>
+    <form action="/ruta-a-tu-base-de-datos" method="POST">
+        <label for="texto_usuario">Completar campo:</label>
+        <input type="text" id="texto_usuario" name="texto_usuario" required>
+        <button type="submit">Guardar</button>
+    </form>
 
     <br><br>
     <nav>
