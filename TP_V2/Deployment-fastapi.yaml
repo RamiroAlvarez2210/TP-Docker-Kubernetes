@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: fastapi-pod
+  template:
+    metadata:
+      labels:
+        app: fastapi-pod
+    spec:
+      containers:
+        - name: fastapi
+          image: ramiroalvarez2210/tp-fastapi
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: /data
+              name: pvc-fastapi-volume
+      volumes:
+      - name: pvc-fastapi-volume
+        persistentVolumeClaim:
+          claimName: pvc-fastapi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: index-service
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    app: fastapi-pod
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-fastapi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

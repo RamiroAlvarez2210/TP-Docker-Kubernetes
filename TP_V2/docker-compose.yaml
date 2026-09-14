@@ -8,14 +8,14 @@ services:
       - my-vol:/data/
 
   nginx-main:
-    image: nginx:alpine
+    image: ramiroalvarez2210/nginx-main
     ports:
       - 8081:80
     volumes:
       - ./main.html:/usr/share/nginx/html/index.html:Z
 
   nginx-estadisticas:
-    image: nginx:alpine
+    image: ramiroalvarez2210/nginx-estadisticas
     ports:
       - 8082:80
     volumes:
