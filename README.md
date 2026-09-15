@@ -350,4 +350,6 @@ y luego ingresando a las paginas o usando un comando, como por ejemplo
 ```bash
 for i in $(seq 1 20); do curl -s http://localhost:8080/main > /dev/null; done
 ```
-verificamos como kubernetes redistribuye el trafico y el acceso de los pods varia
+verificamos como kubernetes redistribuye el trafico y el acceso de los pods varia.
+
+Por configuracion de las imagenes de main y estadisticas, los ruteos y asignacion de direcciones, las redirecciones de cada archivo fallan. De igual manera podemos verificar el acceso a cada servicio directamente por su definición.
