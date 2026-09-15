@@ -73,7 +73,7 @@ volumes:
 
 ```
 
-El docker-compose levanta 3 contenedores que se especifican con el nombre fastapi, nginx-main y nginx-estadisticas. Para el caso de main y estadisticas realiza un pull a mi repositorio personal para utilizar las imagenes de los html's y se especifica un puerto de acceso que conecta con el puerto 80 default de nginx. Para el caso de fastapi se buildea la imagen del Dockerfile, anteriormente creado, que se encuentra en el directorio. A su vez se especifica el puerto de salida que conecta con el puerto 8000 de fastapi y un volumen detallado el cual persiste la informacion incluido dentro del directorio /data quie esta en el container de fastapi.
+El docker-compose levanta 3 contenedores que se especifican con el nombre fastapi, nginx-main y nginx-estadisticas. Para el caso de main y estadisticas realiza un pull a mi repositorio personal para utilizar las imagenes de los html's y se especifica un puerto de acceso que conecta con el puerto 80 default de nginx. Para el caso de fastapi se buildea la imagen del Dockerfile, anteriormente creado y usado con build: ., que se encuentra en el directorio. A su vez se especifica el puerto de salida que conecta con el puerto 8000 de fastapi y un volumen detallado el cual persiste la informacion incluido dentro del directorio /data quie esta en el container de fastapi.
 
 Para ejecutar nuestro compose utilizaremos el comando
 ```bash
@@ -92,12 +92,12 @@ Para el uso de la imagen main y estadisticas se utilizo un Dockerfile para cada 
 ```Dockerfile
 FROM nginx:alpine
 
-COPY archivo.html /nginx/
+COPY archivo.html /usr/share/nginx/html/index.html
 ```
 
 # Kubernetes
 
-Para la practica de Kubernetes se reutilizaron los containers creados para la practica de Docker. Se implemento un manifiesto deployment y uno service para cada container usado (main, estadisticas y fastapi).
+Para la practica de Kubernetes se reutilizaron los containers creados para la practica de Docker. Se implemento un manifiesto deployment y uno service para cada container usado (main, estadisticas y fastapi). Si bien el enunciado requiere un unico Deployment y un unico service, se decidio implementar mas componentes para la reutilizacion y extension con lo creado anteriormente.
 
 A continuacion el Deployment.yaml de cada servicio:
 
@@ -295,7 +295,7 @@ curl http://localhost:8000/stats
 o simplemente ingresando via navegador a http://localhost:8081/main , http://localhost:8082/estadisticas y http://localhost:8000/stats .
 Las respuestas esperadas para el caso de main es una pagina HTML con un "Hola mundo", para estadisticas la cantidad de accesos a las paginas y para stats (fastapi) la cantidad de acceso de las paginas, es un valor que consulta y utiliza el HTML de estadisticas.
 
-Destacamos que el uso de port-forward siempre utiliza el mismo pod para cada caso, es algo propio de la distribucion con el comando. Si eliminamos el pod en el cual se accede, el port-forward se cierre. Por lo tanto se planteo el uso de un Ingress para la distribucion de los endpoints para cada servicio. Se utilizo el siguiente archivo .yaml.
+Como punto extra se destace que el uso de port-forward siempre utiliza el mismo pod para cada caso, es algo propio de la distribucion con el comando. Si eliminamos el pod en el cual se accede, el port-forward se cierra. Por lo tanto se planteo el uso de un Ingress para la distribucion de los endpoints para cada servicio. Se utilizo el siguiente archivo .yaml.
 
 ```yaml
 # Ingress.yaml
@@ -303,29 +303,27 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-service
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
   - http:
       paths:
       - path: /main
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: main-service
             port:
               number: 8080
       - path: /estadisticas
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: estadisticas-service
             port:
               number: 8080
       - path: /fastapi
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: fastapi-service
@@ -334,10 +332,16 @@ spec:
 
 ```
 
-Se especifica la ruta para cada servicio, el puerto asignad en cada paso y se especifica la implementacion especifica. Ahora podemos realizar un port-fordward para el ingress con 
+Se especifica la ruta para cada servicio, el puerto asignado en cada paso y se especifica la implementacion especifica del servicio el cual va a utilizar. Se utilizara como conexion el cluster local de Kubernetes, por lo tanto levantemos el Ingress.yaml y consultamos el ingress.
 
 ```bash
-kubectl port-forward ingress-service 8080:80
+kubectl get ingress
+```
+Luego verificaremos el address obtenido por el ingress y probaremos las rutas de los servicios. Como ejemplo se obtuvo el address 192.168.49.2 y se realizaron las siguientes consultas:
+
+```bash
+curl http://192.168.49.2/main
+curl http://192.168.49.2/estadisticas
 ```
 
 Podemos verificar el acceso a los pods con 
@@ -353,3 +357,7 @@ for i in $(seq 1 20); do curl -s http://localhost:8080/main > /dev/null; done
 verificamos como kubernetes redistribuye el trafico y el acceso de los pods varia.
 
 Por configuracion de las imagenes de main y estadisticas, los ruteos y asignacion de direcciones, las redirecciones de cada archivo fallan. De igual manera podemos verificar el acceso a cada servicio directamente por su definición.
+
+# Conclusion
+
+En esta practica se implemento el uso de un Dockerfile para la creacion de una imagen que posteriormente podra ser utilizada mediante un docker compose incluyendo otros servicios con sus respectivas imagenes y aplicaciones. Tambien se recreo el deployment de un caso basico de un servicio HTML y se persistieron los volumenes utilizados y actualizados durante su uso. Para el final se verifico el funcionamiento mediante requests HTTP, se verificaron diferentes formas de acceso y se comprobo el comportamiento de las replicas.
