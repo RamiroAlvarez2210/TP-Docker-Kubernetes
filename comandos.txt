@@ -1,3 +1,0 @@
-create configmap nginx-html --from-file=index.html
-kubectl apply -f deployment.yaml
-kubectl port-forward svc/index-service 8080:8080
